@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JWTTokenAuthentication.Models;
+using JWTTokenAuthentication.Utilities;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -9,38 +11,32 @@ using Microsoft.AspNetCore.Mvc;
 namespace JWTTokenAuthentication.Controllers
 {
     [Route("api/[controller]")]
-    public class LoginController : Controller
+    [ApiController]
+    public class LoginController : ControllerBase
     {
-        // GET: api/values
-        [HttpGet]
-        public IEnumerable<string> Get()
+        private ITokenManager _itokenmanager;
+        public LoginController(ITokenManager tokenManager)
         {
-            return new string[] { "value1", "value2" };
+            _itokenmanager = tokenManager;
         }
-
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("Login")]
+        public async Task<IActionResult> ValidateLogin([FromBody] UserCredential user)
         {
-            return "value";
-        }
+            AuthResult authResult = new AuthResult();
 
-        // POST api/values
-        [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+            await Task.Run(() =>
+            {
+                authResult = _itokenmanager.GenerateToken(user);
+            });
 
-        // PUT api/values/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+            return Ok(
+                new
+                {
+                    token = authResult.token,
+                    refreshtoken = authResult.refresh
+                }
 
-        // DELETE api/values/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+                );
         }
     }
 }

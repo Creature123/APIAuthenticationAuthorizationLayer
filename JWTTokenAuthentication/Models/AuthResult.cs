@@ -1,12 +1,12 @@
 ﻿using System;
 namespace JWTTokenAuthentication.Models
 {
-    public record AuthResult
+    public class AuthResult
     {
 
-        public string token;
-        public string refresh;
-    
+        public string token { get; set; }
+        public string refresh { get; set; }
+
     }
 }
 
